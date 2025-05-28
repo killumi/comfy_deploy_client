@@ -15,9 +15,9 @@ void main() async {
   final file = File('assets/images/IMG_2287.JPG');
 
   final uploadUrl = await client.getUploadUrl(
-      // type: 'image/jpg',
-      // fileSize: file.lengthSync(),
-      );
+    type: 'image/jpg',
+    fileSize: file.lengthSync(),
+  );
 
   final dio = Dio();
   final uploadResult = await dio.put(

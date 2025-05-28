@@ -24,9 +24,16 @@ class _ComfyDeployClient implements ComfyDeployClient {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<UploadUrlResult> getUploadUrl() async {
+  Future<UploadUrlResult> getUploadUrl({
+    String? type,
+    int? fileSize,
+  }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'type': type,
+      r'file_size': fileSize,
+    };
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<UploadUrlResult>(Options(

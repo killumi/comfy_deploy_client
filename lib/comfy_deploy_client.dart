@@ -2,9 +2,7 @@ library comfy_deploy_client;
 
 import 'package:comfy_deploy_client/types.dart';
 import 'package:dio/dio.dart';
-import 'package:retrofit/http.dart';
 import 'package:retrofit/retrofit.dart';
-
 part 'comfy_deploy_client.g.dart';
 
 @RestApi(baseUrl: 'https://api.comfydeploy.com/api')
@@ -21,11 +19,10 @@ abstract class ComfyDeployClient {
   }
 
   @GET('/upload-url')
-  Future<UploadUrlResult> getUploadUrl();
-  // Future<UploadUrlResult> getUploadUrl({
-  //   @Query('type')  String? type,
-  //   @Query('file_size')  int? fileSize,
-  // });
+  Future<UploadUrlResult> getUploadUrl({
+    @Query('type') String? type,
+    @Query('file_size') int? fileSize,
+  });
 
   @POST('/run/deployment/queue')
   Future<RunResult> postRun({
