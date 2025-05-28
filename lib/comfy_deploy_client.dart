@@ -21,10 +21,11 @@ abstract class ComfyDeployClient {
   }
 
   @GET('/upload-url')
-  Future<UploadUrlResult> getUploadUrl({
-    @Query('type') required String type,
-    @Query('file_size') required int fileSize,
-  });
+  Future<UploadUrlResult> getUploadUrl();
+  // Future<UploadUrlResult> getUploadUrl({
+  //   @Query('type')  String? type,
+  //   @Query('file_size')  int? fileSize,
+  // });
 
   @POST('/run/deployment/queue')
   Future<RunResult> postRun({

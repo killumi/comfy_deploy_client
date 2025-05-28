@@ -14,7 +14,7 @@ class _ComfyDeployClient implements ComfyDeployClient {
     this.baseUrl,
     this.errorLogger,
   }) {
-    baseUrl ??= 'https://api.comfydeploy.com/api/';
+    baseUrl ??= 'https://api.comfydeploy.com/api';
   }
 
   final Dio _dio;
@@ -24,15 +24,9 @@ class _ComfyDeployClient implements ComfyDeployClient {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<UploadUrlResult> getUploadUrl({
-    required String type,
-    required int fileSize,
-  }) async {
+  Future<UploadUrlResult> getUploadUrl() async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{
-      r'type': type,
-      r'file_size': fileSize,
-    };
+    final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<UploadUrlResult>(Options(
