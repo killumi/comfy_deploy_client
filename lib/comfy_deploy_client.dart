@@ -7,7 +7,7 @@ import 'package:retrofit/retrofit.dart';
 
 part 'comfy_deploy_client.g.dart';
 
-@RestApi(baseUrl: 'https://api.comfydeploy.com/')
+@RestApi(baseUrl: 'https://api.comfydeploy.com/api')
 abstract class ComfyDeployClient {
   factory ComfyDeployClient({
     required String apiKey,
