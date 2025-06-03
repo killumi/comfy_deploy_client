@@ -39,3 +39,37 @@ abstract class ComfyDeployClient {
     @Path() required String deploymentId,
   });
 }
+
+@RestApi(baseUrl: 'http://159.223.239.38:8080/comfy')
+abstract class ComfyImageClient {
+  factory ComfyImageClient({
+    required String token,
+    Dio? dio,
+    String? baseUrl,
+    bool enableLogging = true,
+  }) {
+    final clientDio = dio ?? Dio();
+
+    final authToken = token.startsWith('Bearer ') ? token : 'Bearer $token';
+    clientDio.options.headers['X-Authorization'] = authToken;
+
+    if (enableLogging) {
+      clientDio.interceptors.add(
+        LogInterceptor(
+          responseBody: true,
+          requestBody: true,
+          error: true,
+          logPrint: (o) => print(o),
+        ),
+      );
+    }
+
+    return _ComfyImageClient(clientDio, baseUrl: baseUrl);
+  }
+
+  @GET('/upload-url')
+  Future<UploadUrlResult> getImageUploadUrl({
+    @Query('type') String? type,
+    @Query('file_size') int? fileSize,
+  });
+}
