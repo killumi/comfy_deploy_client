@@ -88,21 +88,23 @@ abstract class ComfyDeployPlatformClient {
 //   });
 // }
 
-@RestApi()
-abstract class UploadImagePlatformClient {
-  factory UploadImagePlatformClient({
+class UploadImageService {
+  final String _token;
+  final String? _proxyUrl;
+  final Dio _dio;
+
+  UploadImageService({
     required String token,
+    String? proxyUrl,
     Dio? dio,
     bool enableLogging = true,
-    String? proxyUrl,
-  }) {
-    final clientDio = dio ?? Dio();
-
-    final authToken = token.startsWith('Bearer ') ? token : 'Bearer $token';
-    clientDio.options.headers['X-Authorization'] = authToken;
+  })  : _token = token.startsWith('Bearer ') ? token : 'Bearer $token',
+        _proxyUrl = proxyUrl,
+        _dio = dio ?? Dio() {
+    _dio.options.headers['X-Authorization'] = _token;
 
     if (enableLogging) {
-      clientDio.interceptors.add(
+      _dio.interceptors.add(
         LogInterceptor(
           responseBody: true,
           requestBody: true,
@@ -111,47 +113,33 @@ abstract class UploadImagePlatformClient {
         ),
       );
     }
-
-    const realApiUrl = 'http://159.223.239.38:8080/comfy';
-
-    final baseUrl = kIsWeb && proxyUrl != null && proxyUrl.isNotEmpty
-        ? proxyUrl
-        : realApiUrl;
-
-    return _UploadImagePlatformClient(clientDio, baseUrl: baseUrl);
   }
-
-  @GET('/upload-url')
-  Future<UploadUrlResult> getImageUploadUrl({
-    @Query('type') String? type,
-    @Query('file_size') int? fileSize,
-    @Query('proxy_url') String? proxyUrl,
-  });
-}
-
-class UploadImageService {
-  final UploadImagePlatformClient _client;
-  final String? _proxyUrl;
-  final bool _isWeb;
-
-  UploadImageService(this._client, this._proxyUrl, this._isWeb);
 
   Future<UploadUrlResult> getImageUploadUrl({
     required String type,
     required int fileSize,
   }) async {
-    if (_isWeb && _proxyUrl != null) {
-      const realApiUrl = 'http://159.223.239.38:8080/comfy';
-      return _client.getImageUploadUrl(
-        type: type,
-        fileSize: fileSize,
-        proxyUrl: '$realApiUrl/upload-url',
+    if (kIsWeb && _proxyUrl != null) {
+      // Для веб-версии используем прокси
+      final response = await _dio.get(
+        _proxyUrl,
+        queryParameters: {
+          'proxy_url': 'http://159.223.239.38:8080/comfy/upload-url',
+          'type': type,
+          'file_size': fileSize,
+        },
       );
+      return UploadUrlResult.fromJson(response.data);
     } else {
-      return _client.getImageUploadUrl(
-        type: type,
-        fileSize: fileSize,
+      // Для мобильной версии прямой запрос
+      final response = await _dio.get(
+        'http://159.223.239.38:8080/comfy/upload-url',
+        queryParameters: {
+          'type': type,
+          'file_size': fileSize,
+        },
       );
+      return UploadUrlResult.fromJson(response.data);
     }
   }
 }
