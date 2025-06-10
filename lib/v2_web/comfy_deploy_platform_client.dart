@@ -48,6 +48,46 @@ abstract class ComfyDeployPlatformClient {
 }
 
 // ------------------------------
+// @RestApi()
+// abstract class UploadImagePlatformClient {
+//   factory UploadImagePlatformClient({
+//     required String token,
+//     Dio? dio,
+//     bool enableLogging = true,
+//     String? proxyUrl,
+//   }) {
+//     final clientDio = dio ?? Dio();
+
+//     final authToken = token.startsWith('Bearer ') ? token : 'Bearer $token';
+//     clientDio.options.headers['X-Authorization'] = authToken;
+
+//     if (enableLogging) {
+//       clientDio.interceptors.add(
+//         LogInterceptor(
+//           responseBody: true,
+//           requestBody: true,
+//           error: true,
+//           logPrint: (o) => print(o),
+//         ),
+//       );
+//     }
+
+//     const realApiUrl = 'http://159.223.239.38:8080/comfy';
+
+//     final baseUrl = kIsWeb && proxyUrl != null && proxyUrl.isNotEmpty
+//         ? '$proxyUrl?proxy_url=${Uri.encodeComponent(realApiUrl)}'
+//         : realApiUrl;
+
+//     return _UploadImagePlatformClient(clientDio, baseUrl: baseUrl);
+//   }
+
+//   @GET('/upload-url')
+//   Future<UploadUrlResult> getImageUploadUrl({
+//     @Query('type') String? type,
+//     @Query('file_size') int? fileSize,
+//   });
+// }
+
 @RestApi()
 abstract class UploadImagePlatformClient {
   factory UploadImagePlatformClient({
@@ -75,7 +115,7 @@ abstract class UploadImagePlatformClient {
     const realApiUrl = 'http://159.223.239.38:8080/comfy';
 
     final baseUrl = kIsWeb && proxyUrl != null && proxyUrl.isNotEmpty
-        ? '$proxyUrl?proxy_url=${Uri.encodeComponent(realApiUrl)}'
+        ? proxyUrl
         : realApiUrl;
 
     return _UploadImagePlatformClient(clientDio, baseUrl: baseUrl);
@@ -85,5 +125,33 @@ abstract class UploadImagePlatformClient {
   Future<UploadUrlResult> getImageUploadUrl({
     @Query('type') String? type,
     @Query('file_size') int? fileSize,
+    @Query('proxy_url') String? proxyUrl,
   });
+}
+
+class UploadImageService {
+  final UploadImagePlatformClient _client;
+  final String? _proxyUrl;
+  final bool _isWeb;
+
+  UploadImageService(this._client, this._proxyUrl, this._isWeb);
+
+  Future<UploadUrlResult> getImageUploadUrl({
+    required String type,
+    required int fileSize,
+  }) async {
+    if (_isWeb && _proxyUrl != null) {
+      const realApiUrl = 'http://159.223.239.38:8080/comfy';
+      return _client.getImageUploadUrl(
+        type: type,
+        fileSize: fileSize,
+        proxyUrl: '$realApiUrl/upload-url',
+      );
+    } else {
+      return _client.getImageUploadUrl(
+        type: type,
+        fileSize: fileSize,
+      );
+    }
+  }
 }
