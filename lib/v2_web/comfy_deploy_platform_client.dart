@@ -48,7 +48,6 @@ abstract class ComfyDeployPlatformClient {
 }
 
 // ------------------------------
-
 @RestApi()
 abstract class UploadImagePlatformClient {
   factory UploadImagePlatformClient({
@@ -73,11 +72,11 @@ abstract class UploadImagePlatformClient {
       );
     }
 
-    const baseApiUrl = 'http://159.223.239.38:8080/comfy';
+    const realApiUrl = 'http://159.223.239.38:8080/comfy/upload-url';
 
     final baseUrl = kIsWeb && proxyUrl != null && proxyUrl.isNotEmpty
-        ? '$proxyUrl?proxy_url=${Uri.encodeComponent('$baseApiUrl/upload-url')}'
-        : '$baseApiUrl/upload-url';
+        ? '$proxyUrl?proxy_url=${Uri.encodeComponent(realApiUrl)}'
+        : realApiUrl;
 
     return _UploadImagePlatformClient(clientDio, baseUrl: baseUrl);
   }
