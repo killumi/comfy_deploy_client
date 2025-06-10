@@ -72,7 +72,7 @@ abstract class UploadImagePlatformClient {
       );
     }
 
-    const realApiUrl = 'http://159.223.239.38:8080/comfy/upload-url';
+    const realApiUrl = 'http://159.223.239.38:8080/comfy';
 
     final baseUrl = kIsWeb && proxyUrl != null && proxyUrl.isNotEmpty
         ? '$proxyUrl?proxy_url=${Uri.encodeComponent(realApiUrl)}'
@@ -81,7 +81,7 @@ abstract class UploadImagePlatformClient {
     return _UploadImagePlatformClient(clientDio, baseUrl: baseUrl);
   }
 
-  @GET('')
+  @GET('/upload-url')
   Future<UploadUrlResult> getImageUploadUrl({
     @Query('type') String? type,
     @Query('file_size') int? fileSize,
